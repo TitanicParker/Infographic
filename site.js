@@ -1,17 +1,25 @@
 (() => {
   const page = document.body.dataset.page || "";
+  const WORDLESS_STATE = "completed-intelligibility-wordless-return";
+
+  const wordlessIcon = `
+    <span class="wordless-mark" aria-hidden="true">
+      <i></i><i></i><i></i>
+    </span>`;
+
   const header = `
     <header class="global-header">
-      <a class="global-brand" href="index.html" aria-label="Completed Intelligibility home">
+      <a class="global-brand" href="home.html" aria-label="Completed Intelligibility home">
         <span class="brand-mark" aria-hidden="true"><span></span></span>
         <span><strong>Completed Intelligibility</strong><small>The architecture of landing</small></span>
       </a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="global-navigation">Menu</button>
       <nav class="global-navigation" id="global-navigation" aria-label="Primary navigation">
-        <a href="index.html" ${page === "home" ? 'aria-current="page"' : ""}>Home</a>
+        <a href="home.html" ${page === "home" ? 'aria-current="page"' : ""}>Home</a>
         <a href="infographics.html" ${page === "infographics" ? 'aria-current="page"' : ""}>Infographics</a>
         <a href="pitch.html" ${page === "pitch" ? 'aria-current="page"' : ""}>Pitch</a>
         <a href="concept.html" ${page === "concept" ? 'aria-current="page"' : ""}>Concept</a>
+        <a class="wordless-nav-link" href="index.html" data-wordless-link>${wordlessIcon}<span>Wordless</span></a>
       </nav>
     </header>`;
 
@@ -25,11 +33,72 @@
         <a href="infographics.html">Infographics</a>
         <a href="pitch.html">Read the pitch</a>
         <a href="concept.html">Explore the concept</a>
+        <a href="index.html" data-wordless-link>Return to the wordless field</a>
       </nav>
     </footer>`;
 
+  const floatingWordless = `
+    <a class="wordless-return" href="index.html" data-wordless-link aria-label="Return to the wordless experience" title="Return to the wordless experience">
+      ${wordlessIcon}
+    </a>`;
+
+  const stylesheet = document.createElement("link");
+  stylesheet.rel = "stylesheet";
+  stylesheet.href = "wordless.css";
+  document.head.appendChild(stylesheet);
+
   document.body.insertAdjacentHTML("afterbegin", header);
   document.body.insertAdjacentHTML("beforeend", footer);
+  document.body.insertAdjacentHTML("beforeend", floatingWordless);
+
+  const captureReadingState = () => {
+    const state = {
+      href: `${location.pathname.split("/").pop() || "home.html"}${location.search}${location.hash}`,
+      scrollY: window.scrollY,
+      savedAt: Date.now()
+    };
+
+    const frame = document.querySelector(".document-embed");
+    if (frame) {
+      try {
+        state.frameScrollY = frame.contentWindow?.scrollY || 0;
+      } catch (_) {
+        state.frameScrollY = 0;
+      }
+    }
+
+    sessionStorage.setItem(WORDLESS_STATE, JSON.stringify(state));
+  };
+
+  document.querySelectorAll("[data-wordless-link]").forEach(link => {
+    link.addEventListener("click", captureReadingState);
+  });
+
+  const restoreReadingState = () => {
+    let state;
+    try {
+      state = JSON.parse(sessionStorage.getItem(WORDLESS_STATE) || "null");
+    } catch (_) {
+      state = null;
+    }
+    if (!state) return;
+
+    const current = location.pathname.split("/").pop() || "home.html";
+    const saved = (state.href || "").split(/[?#]/)[0];
+    if (saved !== current) return;
+
+    requestAnimationFrame(() => window.scrollTo(0, Number(state.scrollY) || 0));
+
+    const frame = document.querySelector(".document-embed");
+    if (frame && Number.isFinite(Number(state.frameScrollY))) {
+      frame.addEventListener("load", () => {
+        try {
+          frame.contentWindow.scrollTo(0, Number(state.frameScrollY) || 0);
+        } catch (_) {}
+      }, { once: true });
+    }
+  };
+  restoreReadingState();
 
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".global-navigation");
