@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Theorem Zero Endless Blend Runtime</title>
+<style>
+  :root { --bg: #05080d; }
+  html, body {
+    margin: 0;
+    width: 100%; height: 100%; overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(22,45,60,.66), rgba(5,8,13,1) 64%),
+      linear-gradient(180deg, #08131e, var(--bg));
+  }
+  body { display: grid; place-items: center; }
+  canvas { width: min(96vw,96vh); height: min(96vw,96vh); display:block; }
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Theorem Zero endless lawful emergence runtime"></canvas>
+<script>
+(() => {
+  'use strict';
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const SQRT3 = Math.sqrt(3);
+  const TAU = Math.PI * 2;
+
+  // Locked native substrate: axial triangular/barycentric station field.
+  const OFFSETS = [
+    [-1,0], [0,-1], [1,-1], [1,0], [0,1], [-1,1]
+  ];
+  const norm = (q,r) => q*q + q*r + r*r;
+  const key = (q,r) => `${q},${r}`;
+  const add = (a,b) => [a[0]+b[0], a[1]+b[1]];
+  const proj = (q,r) => [q + r/2, -SQRT3*r/2];
+  const clamp01 = x => Math.max(0, Math.min(1, x));
+  const smooth = x => { x = clamp01(x); return x*x*(3-2*x); };
+  const pulse = (x,a,b) => smooth((x-a)/(b-a)) * (1 - smooth((x-b)/(b-a))); // soft hump, use with b>a
+  const fadeIn = (x,a,b) => smooth((x-a)/(b-a));
+  const fadeOut = (x,a,b) => 1 - smooth((x-a)/(b-a));
+  const band = (x,a,b,c,d) => fadeIn(x,a,b) * fadeOut(x,c,d);
+
+  function resize(){
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    const s = Math.min(window.innerWidth*.96, window.innerHeight*.96);
+    canvas.width = Math.round(s*dpr);
+    canvas.height = Math.round(s*dpr);
+    canvas.style.width = s+'px'; canvas.style.height = s+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resize); resize();
+
+  // Station patches.
+  const stations = [];
+  for(let q=-6;q<=6;q++) for(let r=-6;r<=6;r++) {
+    const n = norm(q,r);
+    if(n <= 25) stations.push({q,r,n,k:key(q,r), p:proj(q,r)});
+  }
+  stations.sort((a,b)=> a.n-b.n || a.q-b.q || a.r-b.r);
+  const byKey = new Map(stations.map(s=>[s.k,s]));
+  const firstRing = stations.filter(s=>s.n===1);
+  const fruit = stations.filter(s=>s.n===0 || s.n===1 || s.n===3);
+  const flower19 = stations.filter(s=>s.n<=4);
+  const catch73 = stations.filter(s=>s.n<=25 && [0,1,3,4,7,9,13,16,21,25].includes(s.n));
+
+  function generatedFrom(centres){
+    const set = new Map();
+    centres.forEach(c => OFFSETS.forEach(o => {
+      const [q,r] = add([c.q,c.r], o); const s = byKey.get(key(q,r)); if(s) set.set(s.k,s);
+    }));
+    return [...set.values()];
+  }
+
+  // Joins used as coordinate-recorded overlays, not substrate authority.
+  function allPairs(arr){
+    const out=[];
+    for(let i=0;i<arr.length;i++) for(let j=i+1;j<arr.length;j++) out.push([arr[i], arr[j]]);
+    return out;
+  }
+  const metatronPairs = allPairs(fruit).filter(([a,b]) => {
+    const n = norm(b.q-a.q, b.r-a.r);
+    return n===1 || n===3 || n===4 || n===7 || n===12;
+  });
+  const carrierSegments = [];
+  const reach = 5;
+  // Build carrier segments along q=c, r=c, q+r=c within window.
+  for(let c=-5;c<=5;c++){
+    carrierSegments.push({fam:0, a:proj(c,-reach), b:proj(c,reach)});
+    carrierSegments.push({fam:1, a:proj(-reach,c), b:proj(reach,c)});
+    carrierSegments.push({fam:2, a:proj(-reach,c+reach), b:proj(reach,c-reach)});
+  }
+
+  // Platonic/projective overlay sketches from earned Fruit stations.
+  const S = Object.fromEntries(fruit.map(s=>[s.k,s]));
+  function st(q,r){ return byKey.get(key(q,r)); }
+  const O = st(0,0), A=st(-1,0), B=st(0,-1), C=st(1,-1), D=st(1,0), E=st(0,1), F=st(-1,1);
+  const U=st(-1,-1), V=st(1,-2), W=st(2,-1), X=st(1,1), Y=st(-1,2), Z=st(-2,1);
+  const solidOverlays = [
+    [[A,C],[C,E],[E,A],[B,D],[D,F],[F,B]],
+    [[U,V],[V,W],[W,X],[X,Y],[Y,Z],[Z,U],[U,X],[V,Y],[W,Z]],
+    [[V,D],[D,X],[X,F],[F,Z],[Z,A],[A,V],[B,W],[W,E],[E,Y],[Y,C],[C,U],[U,B]],
+    [[U,W],[W,Y],[Y,U],[V,X],[X,Z],[Z,V],[A,D],[B,E],[C,F]],
+    [[U,D],[D,Y],[Y,A],[A,W],[W,F],[F,V],[V,C],[C,Z],[Z,E],[E,X],[X,B],[B,U]]
+  ];
+
+  const modes = [
+    {name:'source', start:0, dur:55},
+    {name:'carrierWeave', start:55, dur:55},
+    {name:'fruitMetatron', start:110, dur:55},
+    {name:'platonicAudit', start:165, dur:55},
+    {name:'catchmentSettle', start:220, dur:55},
+    {name:'releaseReturn', start:275, dur:55}
+  ];
+  const total = modes.reduce((s,m)=>s+m.dur,0);
+
+  function currentMode(t){
+    const tt = ((t%total)+total)%total;
+    let acc=0;
+    for(const m of modes){ if(tt>=acc && tt<acc+m.dur) return {m, u:(tt-acc)/m.dur, tt}; acc += m.dur; }
+    return {m:modes[0], u:0, tt:0};
+  }
+
+  function clear(){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    ctx.clearRect(0,0,w,h);
+    const g = ctx.createRadialGradient(w/2,h*.46,0,w/2,h*.46,w*.58);
+    g.addColorStop(0,'rgba(28,60,80,.23)');
+    g.addColorStop(.55,'rgba(8,20,31,.35)');
+    g.addColorStop(1,'rgba(5,8,13,.85)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+  }
+
+  function transform(viewReach){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    const scale = Math.min(w,h) * .43 / viewReach;
+    return p => [w/2 + p[0]*scale, h/2 + p[1]*scale];
+  }
+
+  function drawLine(a,b, alpha=1, width=1, hue='120,220,255'){
+    if(alpha<=0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = width;
+    ctx.strokeStyle = `rgba(${hue},${alpha})`;
+    ctx.shadowColor = `rgba(${hue},.65)`; ctx.shadowBlur = 10*alpha;
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+    ctx.restore();
+  }
+  function drawPoint(p, alpha=1, r=3, hue='210,250,255'){
+    if(alpha<=0) return;
+    ctx.save(); ctx.globalAlpha = alpha;
+    ctx.fillStyle = `rgba(${hue},${alpha})`; ctx.shadowColor = `rgba(${hue},.9)`; ctx.shadowBlur = 14*alpha;
+    ctx.beginPath(); ctx.arc(p[0],p[1],r,0,TAU); ctx.fill(); ctx.restore();
+  }
+  function drawCircle(p, radius, alpha=1, width=1.2, hue='160,230,255', partial=1){
+    if(alpha<=0) return;
+    ctx.save(); ctx.globalAlpha = alpha; ctx.lineWidth=width;
+    ctx.strokeStyle=`rgba(${hue},${alpha})`; ctx.shadowColor=`rgba(${hue},.6)`; ctx.shadowBlur=9*alpha;
+    ctx.beginPath(); ctx.arc(p[0],p[1],radius,-Math.PI/2,-Math.PI/2+TAU*partial); ctx.stroke(); ctx.restore();
+  }
+  function drawCell(p1,p2,p3,alpha=1){
+    if(alpha<=0) return;
+    ctx.save(); ctx.globalAlpha = alpha;
+    ctx.fillStyle = `rgba(80,190,220,${.08*alpha})`;
+    ctx.strokeStyle = `rgba(100,230,255,${.18*alpha})`;
+    ctx.lineWidth = .8;
+    ctx.beginPath(); ctx.moveTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.lineTo(p3[0],p3[1]); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  function visibleStationAlpha(s,u,mode){
+    const n = s.n;
+    if(mode==='source') return Math.max(
+      n===0 ? band(u,.02,.08,.92,.99) : 0,
+      n===1 ? band(u,.16,.28,.92,.99) : 0,
+      n===3 ? band(u,.55,.70,.92,.99)*.45 : 0
+    );
+    if(mode==='carrierWeave') return (n<=4 ? fadeIn(u,.18,.55) : 0) * fadeOut(u,.93,.99);
+    if(mode==='fruitMetatron') return (n===0||n===1||n===3 ? fadeIn(u,.05,.35) : 0) * fadeOut(u,.94,.99);
+    if(mode==='platonicAudit') return (n===0||n===1||n===3 ? band(u,.02,.12,.90,.99) : 0);
+    if(mode==='catchmentSettle') return (n<=25 ? fadeIn(u, n/35, n/35+.18) : 0) * fadeOut(u,.94,.99);
+    if(mode==='releaseReturn') return (n===0||n===1||n===3||n===4||n===7 ? band(u,.02,.22,.72,.96) : 0);
+    return 0;
+  }
+
+  function render(now){
+    const t = now/1000;
+    const {m,u} = currentMode(t);
+    clear();
+
+    // Constant global camera temperament with slow breathing.
+    const viewReach = 5.15 + Math.sin(t*.06)*.28 + (m.name==='source' ? -2.4*(1-smooth(u)) : 0);
+    const T = transform(viewReach);
+    const unitPx = Math.hypot(T(proj(1,0))[0]-T(proj(0,0))[0], T(proj(1,0))[1]-T(proj(0,0))[1]);
+
+    // Carrier layer, native only.
+    let carrierA = .10;
+    if(m.name==='source') carrierA = band(u,.68,.78,.92,.99)*.42;
+    if(m.name==='carrierWeave') carrierA = band(u,.02,.20,.90,.99)*.72;
+    if(m.name==='fruitMetatron') carrierA = band(u,.20,.38,.90,.99)*.55;
+    if(m.name==='platonicAudit') carrierA = band(u,.68,.80,.93,.99)*.68;
+    if(m.name==='catchmentSettle') carrierA = band(u,.50,.72,.92,.99)*.60;
+    if(m.name==='releaseReturn') carrierA = band(u,.10,.22,.74,.98)*.85;
+    carrierSegments.forEach((seg,i)=>{
+      const famPulse = .75 + .25*Math.sin(t*.85 + seg.fam*2.1);
+      drawLine(T(seg.a), T(seg.b), carrierA*famPulse, .55 + .55*carrierA, '95,215,245');
+    });
+
+    // Single witness circle: never more than one construction circle is visible.
+    let witness = null, wa = 0, partial = 1;
+    const witnessCentres = [O,A,B,C,D,E,F,U,V,W,X,Y,Z].filter(Boolean);
+    if(m.name==='source') { witness = O; wa = band(u,.08,.16,.34,.50); partial = fadeIn(u,.08,.25); }
+    if(m.name==='fruitMetatron') { witness = witnessCentres[Math.floor((u*12)%witnessCentres.length)]; wa = band((u*12)%1,.05,.20,.72,.92)*.45; partial = fadeIn((u*12)%1,.05,.55); }
+    if(m.name==='catchmentSettle') { witness = witnessCentres[Math.floor((u*18)%witnessCentres.length)]; wa = band((u*18)%1,.02,.12,.55,.80)*.35; partial = fadeIn((u*18)%1,.02,.35); }
+    if(witness) drawCircle(T(witness.p), unitPx, wa, 1.1, '125,230,255', partial);
+
+    // First hexagon and cell memory.
+    const hexAlpha = m.name==='source' ? band(u,.40,.52,.83,.98) : (m.name==='releaseReturn' ? band(u,.18,.36,.75,.96)*.8 : .08*carrierA);
+    const ring = [A,B,C,D,E,F].filter(Boolean);
+    for(let i=0;i<ring.length;i++) drawLine(T(ring[i].p), T(ring[(i+1)%ring.length].p), hexAlpha, 1.1, '120,235,255');
+    const cellA = m.name==='source' ? band(u,.50,.62,.76,.90)*.32 : (m.name==='carrierWeave' ? band(u,.48,.68,.80,.95)*.22 : (m.name==='catchmentSettle'?band(u,.36,.58,.75,.92)*.18:0));
+    for(let i=0;i<ring.length;i++) drawCell(T(O.p), T(ring[i].p), T(ring[(i+1)%ring.length].p), cellA);
+
+    // Metatron coordinate-recorded join overlay.
+    let joinA = 0;
+    if(m.name==='fruitMetatron') joinA = band(u,.48,.62,.72,.88)*.36;
+    if(m.name==='platonicAudit') joinA = band(u,.10,.22,.78,.90)*.18;
+    metatronPairs.forEach(([a,b],i)=>{
+      const flicker = .80 + .20*Math.sin(t*1.7+i*.31);
+      drawLine(T(a.p), T(b.p), joinA*flicker, .7, '170,235,255');
+    });
+
+    // Projection-dependent Platonic audit overlays, one at a time.
+    if(m.name==='platonicAudit'){
+      const k = Math.min(solidOverlays.length-1, Math.floor(u*solidOverlays.length));
+      const local = (u*solidOverlays.length)%1;
+      const a = band(local,.08,.22,.70,.92)*.58;
+      solidOverlays[k].forEach(([p,q],i)=> drawLine(T(p.p), T(q.p), a*(.85+.15*Math.sin(t*2+i)), 1.45, '210,250,255'));
+    }
+
+    // Stations, with duplicate-settlement brightness treated as one station per coordinate.
+    stations.forEach(s=>{
+      const a = visibleStationAlpha(s,u,m.name);
+      if(a<=0) return;
+      const dupGlow = (m.name==='catchmentSettle') ? .9 + .6*band(u,.45,.58,.68,.80) : 1;
+      const r = 2.1 + (s.n===0?1.4:0) + (s.n===1?.6:0);
+      drawPoint(T(s.p), Math.min(1,a*dupGlow), r, s.n===0?'230,255,255':'175,245,255');
+    });
+
+    // Final source-return breathing point and carrier memory.
+    if(m.name==='releaseReturn'){
+      const a = fadeIn(u,.70,.90);
+      drawPoint(T(O.p), a*.85, 4.6, '235,255,255');
+      firstRing.forEach(s=> drawPoint(T(s.p), a*.45, 2.8, '170,245,255'));
+    }
+
+    // Subtle vignette.
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    const vg = ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*.25,w/2,h/2,Math.min(w,h)*.55);
+    vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.28)');
+    ctx.fillStyle = vg; ctx.fillRect(0,0,w,h);
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>
