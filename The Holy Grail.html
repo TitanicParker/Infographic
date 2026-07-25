@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Work-Family Cards — 54 Cells</title>
+<style>
+:root{--bg:#050608;--text:#f7f8fb;--muted:#a1a9b4;--line:rgba(255,255,255,.13);--toward:#7dd3fc;--across:#c4b5fd;--away:#f9a8d4}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:radial-gradient(circle at 15% 0%,rgba(125,211,252,.12),transparent 34%),radial-gradient(circle at 82% 15%,rgba(196,181,253,.1),transparent 35%),radial-gradient(circle at 45% 100%,rgba(249,168,212,.09),transparent 36%),#050608}
+button{font:inherit}
+.app{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr}
+.topbar{height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(5,6,8,.78);backdrop-filter:blur(18px);z-index:5}
+.brand{min-width:0}.title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:750}.meta{margin-top:3px;font-size:10px;color:var(--muted)}
+.actions{display:flex;align-items:center;gap:6px}.btn{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);border-radius:10px;height:34px;padding:0 11px;cursor:pointer}.btn:hover,.btn:focus-visible{background:rgba(255,255,255,.09);outline:none}
+.deck{position:relative;min-height:0;overflow:hidden;touch-action:pan-y pinch-zoom}
+.track{height:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:none}
+.track::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));display:grid;place-items:center}
+.card{position:relative;width:100%;height:100%;max-width:1180px;max-height:820px;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.018));box-shadow:0 30px 100px rgba(0,0,0,.48);display:grid;grid-template-rows:auto 1fr auto}
+.card::before{content:"";position:absolute;inset:0 0 auto;height:5px;background:var(--accent)}
+.card[data-orientation="Toward"]{--accent:var(--toward)}.card[data-orientation="Across"]{--accent:var(--across)}.card[data-orientation="Away"]{--accent:var(--away)}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:clamp(22px,4vw,48px) clamp(22px,5vw,64px) 0}
+.coords{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card-body{display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,5vw,70px) clamp(22px,7vw,90px)}
+.family{font-size:clamp(13px,1.6vw,18px);letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:clamp(16px,3vh,30px)}
+h1{margin:0;font-size:clamp(40px,7vw,92px);line-height:.96;letter-spacing:-.055em;max-width:12ch}
+.landing{margin:clamp(18px,3vh,34px) 0 0;font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:clamp(22px,3.4vw,42px);line-height:1.15;color:#edfaff}
+.sample{margin:clamp(28px,5vh,54px) 0 0;max-width:52ch;font-size:clamp(18px,2.25vw,30px);line-height:1.42;color:#d0d6de}
+.reading{margin:clamp(20px,3.5vh,34px) 0 0;max-width:58ch;padding-top:clamp(16px,2.5vh,24px);border-top:1px solid var(--line);font-size:clamp(15px,1.55vw,21px);line-height:1.55;color:#b9c1cb}.reading strong{color:var(--text);font-weight:700}.reading em{color:#edfaff}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 clamp(22px,5vw,64px) clamp(20px,4vw,42px)}
+.hint{font-size:11px;color:var(--muted)}.progress{height:3px;flex:1;max-width:300px;background:rgba(255,255,255,.09);border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:var(--accent);width:var(--p)}
+.nav{position:absolute;inset:50% 12px auto;transform:translateY(-50%);display:flex;justify-content:space-between;pointer-events:none;z-index:4}.nav button{pointer-events:auto;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(5,6,8,.62);backdrop-filter:blur(12px);color:white;font-size:23px;cursor:pointer}.nav button:hover{background:rgba(255,255,255,.12)}
+.dots{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(5,6,8,.66);backdrop-filter:blur(12px);font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+@media(max-width:700px){.topbar{height:52px;padding:0 12px}.meta{display:none}.slide{padding:10px}.card{border-radius:20px}.card-head{padding:22px 22px 0}.card-body{padding:24px 22px}.card-foot{padding:0 22px 20px}.nav{display:none}h1{max-width:none}}
+@media(prefers-reduced-motion:reduce){.track{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar"><div class="brand"><div class="title">Work-Family Cards</div><div class="meta">54 fullscreen cells · swipe, scroll, or use arrow keys</div></div><div class="actions"><button class="btn" id="startBtn">First</button><button class="btn" id="fullBtn">Fullscreen</button></div></header>
+<main class="deck"><div class="track" id="track" aria-label="Work-family card deck"></div><div class="nav"><button id="prev" aria-label="Previous card">‹</button><button id="next" aria-label="Next card">›</button></div><div class="dots" id="counter">1 / 54</div></main>
+</div>
+<script>
+const columns=[
+  ["Toward","Is"],["Toward","With"],["Toward","Does"],
+  ["Across","Is"],["Across","With"],["Across","Does"],
+  ["Away","Is"],["Away","With"],["Away","Does"]
+];
+const data={
+"Distinction":[
+["Focal Mark","this","A person silently points to an otherwise unnoticed object."],
+["Binary Bearing","this, not that","A two-position switch rests visibly at ON while OFF remains the defining opposite."],
+["Boundary Act","this far","A gate is closed across an entrance and passage stops."],
+["Scoped Standing","within this","A map shades one region and labels the whole shaded area as a protected zone."],
+["Context-Bound Mark","this, here","A referee raises a red card during a match."],
+["Scoped Distinction","these among these","A sieve separates smaller particles from larger particles across its entire surface."],
+["Opposed Standing","opposed","Two positions previously treated as one are set out explicitly as opposing claims."],
+["Graded Contrast","more and less","A greyscale strip moves continuously from white through grey to black."],
+["Exclusive Cut","not admitted","In a radio-button group, selecting one option automatically excludes all the others."]],
+"Expansion":[
+["Source Field","from here","A lamp turns on and the surrounding area becomes visible."],
+["Source-Carried Divergence","from here, either way","Several railway lines diverge from one terminal station."],
+["Branching Output","more ways open","A single plant stem forks into two active shoots."],
+["Alternate Passage","another way through","A footbridge provides another way across a river where the main bridge is unavailable."],
+["Span-Carried Reach","reachable across","An electrical cable carries power from a generator to a distant building."],
+["Field Distribution","available throughout","A sprinkler network activates and water becomes available across the entire field."],
+["Released Option","free to choose","A process that appeared mandatory presents a genuine Skip option."],
+["Continuity Bearing","still through","A ramp replaces a set of steps, making the rise continuously traversable."],
+["Edge Opening","beyond","A tunnel breaks through the far side of a mountain and opens passage beyond the former barrier."]],
+"Relation":[
+["Direct Bearing","this bears on that","Two isolated points are joined by a single line."],
+["Pivoted Balance","held against","Two equal weights hold a seesaw level around its fulcrum."],
+["Responsive Echo","answered","A single call across a canyon returns as an echo."],
+["Sequential Link","then","Three numbered steps appear in fixed order: 1, then 2, then 3."],
+["Reciprocal Shift","each changes the other","Two dancers continuously adjust their movements to one another."],
+["Relational Cycle","back into itself","Objects move around a circular conveyor and return to their starting position."],
+["Pattern Alignment","the same arrangement","A river through a valley and a contrail across the sky are recognised as the same line-splitting-field pattern."],
+["Role Correspondence","this plays that role","A bird’s wing and a human arm are mapped bone-for-bone as corresponding limb structures."],
+["Emergent Pattern","between us, something appears","Individual birds respond locally to nearby birds, producing the coordinated movement of a flock."]],
+"Correction":[
+["Focal Adjustment","set right","A musician turns one tuning peg until the string reaches the target pitch."],
+["Weighted Correction","rightly weighted","A stereo balance control is adjusted until the sound is centred between unequal speakers."],
+["Load Transfer","the burden moves","A jack is placed beneath a sagging beam, transferring the load into the support."],
+["Inversion Test","does it still hold reversed?","A proof is checked in reverse, from conclusion back to premise, and still holds."],
+["Dual-Bound Repair","right between both","Hot and cold water are adjusted together until the mixed water reaches the required temperature."],
+["Corrective Turn","turn where it fails","A driver steers a drifting car back into its lane."],
+["Limit Reset","a better limit","A safety threshold is found to be wrongly set and is reset to the correct limit."],
+["Conditioned Reversal","reverse when this holds","A lift reaches the top floor and reverses direction downward."],
+["Disorder Release","free of the fault","A jammed mechanism is cleared and begins running smoothly again."]],
+"Integration":[
+["Focal Whole","one whole","Hub, spokes, and rim are assembled, and a wheel stands."],
+["Frame-Bound Whole","held as one","Coloured glass pieces become one image through the lead frame that fixes each piece in place."],
+["Joint Capacity","together, able","Two blades are joined at a pivot and become scissors capable of cutting."],
+["Role Array","each in its place","Elements are arranged into the periodic table, each occupying a structurally determined position."],
+["Span-Bound Interlock","held together across","The stones of an arch hold one another in place across the opening."],
+["Role Activation","in operation","A missing gear is fitted into a clock, and the hands begin moving."],
+["Released Equilibrium","able to remain","An uneven tripod is adjusted until the whole stands level and stable."],
+["Sustained Equilibrium","tension that holds","A suspension bridge remains stable through the counterbearing of deck, cables, towers, and anchors."],
+["Convergent Whole","many become one act","Separate assembly lines deliver different components that converge into one working machine."]],
+"Rest":[
+["Settled Alternative","chosen","After considering several keys, a person sets one apart as the chosen key and stops searching."],
+["Settled Unity-Bearing","together now","Two independently developed expressions are established as one identity, with the equality relation remaining explicit."],
+["Path Completion","arrived","A runner crosses the finish line."],
+["Settled Recurrence","it returns","After repeated observations, the tide is recognised as returning in the same regular pattern."],
+["Condition-Bound Settlement","settled if","For every right-angled triangle, the square of the hypotenuse equals the sum of the squares of the other two sides."],
+["Case Settlement","settled across the cases","Once the rule is settled, every remaining case is resolved by the same completed treatment."],
+["Transformation Release","still itself","Pythagoras’ theorem is expressed in different languages, yet the theorem remains the same completed relation."],
+["Retrospective Settlement","now it makes sense","A later diagnosis makes an earlier unexplained symptom intelligible."],
+["Continuation Discharge","nothing further is owed","A final musical cadence resolves and the piece can end without remainder."]]
+};
+const track=document.getElementById('track');
+const orientationText={Toward:'toward one focus',Across:'across a field',Away:'away from what came before'};
+const modeText={Is:'as what is',With:'in what is held together',Does:'as what is completed'};
+const cards=[];let n=0;
+Object.entries(data).forEach(([family,cells])=>cells.forEach((c,i)=>{
+  const [orientation,mode]=columns[i]; n++;
+  const slide=document.createElement('section');slide.className='slide';slide.setAttribute('aria-label',`${n} of 54: ${c[0]}`);
+  slide.innerHTML=`<article class="card" data-orientation="${orientation}"><div class="card-head"><div class="coords">${orientation} / ${mode}</div><div class="count">${String(n).padStart(2,'0')} / 54</div></div><div class="card-body"><div class="family">${family}</div><h1>${c[0]}</h1><p class="landing">${c[1]}</p><p class="sample">${c[2]}</p><p class="reading"><strong>${family}</strong> settles <strong>${orientationText[orientation]}</strong>, remains <strong>${modeText[mode]}</strong>, and lands as <strong>${c[0]}</strong>: <em>${c[1]}</em>.</p></div><div class="card-foot"><div class="hint">Swipe to continue</div><div class="progress"><i style="--p:${(n/54)*100}%"></i></div></div></article>`;
+  track.appendChild(slide); cards.push(slide);
+}));
+let index=0;const counter=document.getElementById('counter');
+function go(i){index=Math.max(0,Math.min(cards.length-1,i));cards[index].scrollIntoView({behavior:'smooth',inline:'start'});counter.textContent=`${index+1} / 54`;}
+function sync(){index=Math.round(track.scrollLeft/track.clientWidth);counter.textContent=`${index+1} / 54`;}
+track.addEventListener('scroll',()=>requestAnimationFrame(sync),{passive:true});
+document.getElementById('prev').onclick=()=>go(index-1);document.getElementById('next').onclick=()=>go(index+1);document.getElementById('startBtn').onclick=()=>go(0);
+document.getElementById('fullBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.();
+window.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(index+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(index-1)}if(e.key==='Home')go(0);if(e.key==='End')go(53)});
+window.addEventListener('resize',()=>go(index));
+</script>
+</body>
+</html>
