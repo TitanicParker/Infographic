@@ -19,6 +19,7 @@
         <a href="infographics.html" ${page === "infographics" ? 'aria-current="page"' : ""}>Infographics</a>
         <a href="pitch.html" ${page === "pitch" ? 'aria-current="page"' : ""}>Pitch</a>
         <a href="concept.html" ${page === "concept" ? 'aria-current="page"' : ""}>Concept</a>
+        <a href="The%20Holy%20Grail.html">Holy Grail</a>
         <a class="wordless-nav-link" href="index.html" data-wordless-link>${wordlessIcon}<span>Wordless</span></a>
       </nav>
     </header>`;
@@ -33,6 +34,7 @@
         <a href="infographics.html">Infographics</a>
         <a href="pitch.html">Read the pitch</a>
         <a href="concept.html">Explore the concept</a>
+        <a href="The%20Holy%20Grail.html">Open the Holy Grail</a>
         <a href="index.html" data-wordless-link>Return to the wordless field</a>
       </nav>
     </footer>`;
